@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CineMatch &mdash; Movie Recommender</title>
   <style>
-    /* ── Reset & base ──────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
@@ -27,7 +26,6 @@
       min-height: 100vh;
     }
 
-    /* ── Header ───────────────────────────────────────────── */
     header {
       background: linear-gradient(135deg, #0d0f14 0%, #1a0a0a 100%);
       border-bottom: 1px solid var(--border);
@@ -39,19 +37,13 @@
     .logo { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; }
     .logo span { color: var(--accent); }
     .tagline { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
-    .stats-bar {
-      margin-left: auto;
-      display: flex;
-      gap: 2rem;
-    }
+    .stats-bar { margin-left: auto; display: flex; gap: 2rem; }
     .stat { text-align: center; }
     .stat-num { font-size: 1.1rem; font-weight: 700; color: var(--accent2); }
     .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
-    /* ── Main layout ──────────────────────────────────────── */
     main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
 
-    /* ── Search card ──────────────────────────────────────── */
     .search-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -61,11 +53,7 @@
     }
     .search-card h2 { font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text); }
 
-    .input-row {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
+    .input-row { display: flex; gap: 1rem; flex-wrap: wrap; }
     .input-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 180px; }
     label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
     input[type="number"] {
@@ -97,7 +85,6 @@
     .btn:active { transform: scale(0.97); }
     .btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
-    /* ── Error banner ─────────────────────────────────────── */
     .error-banner {
       background: #2a0a0a;
       border: 1px solid #5c1a1a;
@@ -108,7 +95,6 @@
       display: none;
     }
 
-    /* ── Results layout ───────────────────────────────────── */
     #results { display: none; }
 
     .results-grid {
@@ -121,7 +107,6 @@
       .results-grid { grid-template-columns: 1fr; }
     }
 
-    /* ── User profile panel ───────────────────────────────── */
     .user-panel {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -170,8 +155,6 @@
     .rated-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .stars { color: var(--accent2); font-size: 0.75rem; white-space: nowrap; }
 
-    /* ── Recommendations panel ────────────────────────────── */
-    .recs-panel {}
     .recs-header {
       display: flex;
       align-items: center;
@@ -200,23 +183,11 @@
       border-radius: var(--radius);
       padding: 1.1rem;
       transition: border-color 0.2s, transform 0.2s;
-      cursor: default;
     }
     .movie-card:hover { border-color: var(--accent); transform: translateY(-3px); }
 
-    .movie-rank {
-      font-size: 0.72rem;
-      color: var(--muted);
-      margin-bottom: 0.4rem;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-    }
-    .movie-title {
-      font-size: 0.92rem;
-      font-weight: 700;
-      line-height: 1.35;
-      margin-bottom: 0.7rem;
-    }
+    .movie-rank { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.4rem; font-weight: 600; }
+    .movie-title { font-size: 0.92rem; font-weight: 700; line-height: 1.35; margin-bottom: 0.7rem; }
     .genre-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.6rem; }
     .genre-tag {
       background: #252a3a;
@@ -225,7 +196,6 @@
       font-size: 0.68rem;
       color: #8a9ab5;
     }
-    .score-bar-wrap { margin-top: 0.5rem; }
     .score-bar-bg {
       background: var(--border);
       border-radius: 4px;
@@ -240,7 +210,6 @@
     }
     .score-label { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
 
-    /* ── Spinner ──────────────────────────────────────────── */
     .spinner {
       display: none;
       width: 22px; height: 22px;
@@ -252,7 +221,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Footer ───────────────────────────────────────────── */
     footer {
       text-align: center;
       padding: 2rem;
@@ -270,7 +238,7 @@
     <div class="logo">Cine<span>Match</span></div>
     <div class="tagline">User-based Collaborative Filtering &middot; MovieLens 100K</div>
   </div>
-  <div class="stats-bar" id="headerStats">
+  <div class="stats-bar">
     <div class="stat"><div class="stat-num" id="hs-ratings">—</div><div class="stat-label">Ratings</div></div>
     <div class="stat"><div class="stat-num" id="hs-users">—</div><div class="stat-label">Users</div></div>
     <div class="stat"><div class="stat-num" id="hs-movies">—</div><div class="stat-label">Movies</div></div>
@@ -298,7 +266,6 @@
 
   <div id="results">
     <div class="results-grid">
-      <!-- User panel -->
       <div class="user-panel">
         <div class="user-avatar" id="userAvatar">?</div>
         <div class="user-name" id="userName">User —</div>
@@ -311,8 +278,7 @@
         <ul class="rated-list" id="topRatedList"></ul>
       </div>
 
-      <!-- Recommendations -->
-      <div class="recs-panel">
+      <div>
         <div class="recs-header">
           <h3>Recommended for you</h3>
           <span class="count-badge" id="recCount">0</span>
@@ -323,12 +289,9 @@
   </div>
 </main>
 
-<footer>
-  CineMatch &mdash; MovieLens 100K &middot; Cosine Similarity Collaborative Filtering
-</footer>
+<footer>CineMatch &mdash; MovieLens 100K &middot; Cosine Similarity Collaborative Filtering</footer>
 
 <script>
-  // ── Load header stats on page load ──────────────────────
   fetch('/api/stats')
     .then(r => r.json())
     .then(d => {
@@ -337,12 +300,10 @@
       document.getElementById('hs-movies').textContent  = d.total_movies.toLocaleString();
     });
 
-  // ── Allow Enter key ──────────────────────────────────────
   document.getElementById('userId').addEventListener('keydown', e => {
     if (e.key === 'Enter') fetchRecommendations();
   });
 
-  // ── Main fetch function ──────────────────────────────────
   async function fetchRecommendations() {
     const userId  = document.getElementById('userId').value;
     const numRecs = document.getElementById('numRecs').value;
@@ -378,14 +339,11 @@
   }
 
   function renderResults(data) {
-    // User panel
-    const initials = `U${data.user_id}`;
-    document.getElementById('userAvatar').textContent = initials;
+    document.getElementById('userAvatar').textContent = `U${data.user_id}`;
     document.getElementById('userName').textContent   = `User ${data.user_id}`;
     document.getElementById('statRated').textContent  = data.stats.rated;
     document.getElementById('statAvg').textContent    = data.stats.avg_rating;
 
-    // Top-rated list
     const list = document.getElementById('topRatedList');
     list.innerHTML = data.top_rated.map(m => `
       <li>
@@ -393,26 +351,22 @@
         <span class="stars">${'★'.repeat(m.rating)}${'☆'.repeat(5 - m.rating)}</span>
       </li>`).join('');
 
-    // Movie cards
     const maxScore = Math.max(...data.recommendations.map(r => r.score), 1);
     document.getElementById('recCount').textContent = data.recommendations.length;
 
     const grid = document.getElementById('movieGrid');
     grid.innerHTML = data.recommendations.map((m, i) => {
-      const pct = Math.round((m.score / maxScore) * 100);
-      const genres = m.genres.slice(0, 3).map(g =>
-        `<span class="genre-tag">${esc(g)}</span>`).join('');
+      const pct    = Math.round((m.score / maxScore) * 100);
+      const genres = m.genres.slice(0, 3).map(g => `<span class="genre-tag">${esc(g)}</span>`).join('');
       return `
         <div class="movie-card">
           <div class="movie-rank">#${i + 1}</div>
           <div class="movie-title">${esc(m.title)}</div>
           <div class="genre-tags">${genres}</div>
-          <div class="score-bar-wrap">
-            <div class="score-bar-bg">
-              <div class="score-bar-fill" style="width:${pct}%"></div>
-            </div>
-            <div class="score-label">Match score: ${m.score.toFixed(2)}</div>
+          <div class="score-bar-bg">
+            <div class="score-bar-fill" style="width:${pct}%"></div>
           </div>
+          <div class="score-label">Match score: ${m.score.toFixed(2)}</div>
         </div>`;
     }).join('');
   }

@@ -7,8 +7,6 @@ import zipfile
 
 app = Flask(__name__)
 
-# ── Load data once at startup ──────────────────────────────────────────────────
-
 if not os.path.exists('ml-100k'):
     url = 'http://files.grouplens.org/datasets/movielens/ml-100k.zip'
     urllib.request.urlretrieve(url, 'ml-100k.zip')
