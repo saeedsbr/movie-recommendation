@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CineMatch &mdash; Movie Recommender</title>
+  <style>
+    /* ── Reset & base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0f14;
+      --surface:  #161921;
+      --card:     #1e222e;
+      --border:   #2a2f3e;
+      --accent:   #e50914;
+      --accent2:  #f5a623;
+      --text:     #e8eaf0;
+      --muted:    #7a8099;
+      --radius:   12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #0d0f14 0%, #1a0a0a 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.4rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo { font-size: 1.8rem; font-weight: 800; letter-spacing: -1px; }
+    .logo span { color: var(--accent); }
+    .tagline { color: var(--muted); font-size: 0.85rem; margin-top: 2px; }
+    .stats-bar {
+      margin-left: auto;
+      display: flex;
+      gap: 2rem;
+    }
+    .stat { text-align: center; }
+    .stat-num { font-size: 1.1rem; font-weight: 700; color: var(--accent2); }
+    .stat-label { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* ── Main layout ──────────────────────────────────────── */
+    main { max-width: 1100px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+
+    /* ── Search card ──────────────────────────────────────── */
+    .search-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .search-card h2 { font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text); }
+
+    .input-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .input-group { display: flex; flex-direction: column; gap: 0.4rem; flex: 1; min-width: 180px; }
+    label { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+    input[type="number"] {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.7rem 1rem;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input[type="number"]:focus { border-color: var(--accent); }
+
+    .btn {
+      align-self: flex-end;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 2rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn:active { transform: scale(0.97); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── Error banner ─────────────────────────────────────── */
+    .error-banner {
+      background: #2a0a0a;
+      border: 1px solid #5c1a1a;
+      color: #ff7070;
+      border-radius: 8px;
+      padding: 0.9rem 1.2rem;
+      margin-bottom: 1.5rem;
+      display: none;
+    }
+
+    /* ── Results layout ───────────────────────────────────── */
+    #results { display: none; }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 700px) {
+      .results-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── User profile panel ───────────────────────────────── */
+    .user-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+    }
+    .user-avatar {
+      width: 60px; height: 60px;
+      background: linear-gradient(135deg, var(--accent), #a00);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 800;
+      margin-bottom: 1rem;
+    }
+    .user-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .user-sub  { font-size: 0.82rem; color: var(--muted); margin-bottom: 1.2rem; }
+
+    .pill-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
+    .pill {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.3rem 0.8rem;
+      font-size: 0.78rem;
+    }
+    .pill strong { color: var(--accent2); }
+
+    .section-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.7rem;
+    }
+    .rated-list { list-style: none; }
+    .rated-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.85rem;
+      gap: 0.5rem;
+    }
+    .rated-list li:last-child { border-bottom: none; }
+    .rated-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .stars { color: var(--accent2); font-size: 0.75rem; white-space: nowrap; }
+
+    /* ── Recommendations panel ────────────────────────────── */
+    .recs-panel {}
+    .recs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+    .recs-header h3 { font-size: 1.05rem; }
+    .count-badge {
+      background: var(--accent);
+      color: #fff;
+      border-radius: 20px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .movie-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 1rem;
+    }
+
+    .movie-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: default;
+    }
+    .movie-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+
+    .movie-rank {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-bottom: 0.4rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .movie-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      line-height: 1.35;
+      margin-bottom: 0.7rem;
+    }
+    .genre-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.6rem; }
+    .genre-tag {
+      background: #252a3a;
+      border-radius: 4px;
+      padding: 0.15rem 0.45rem;
+      font-size: 0.68rem;
+      color: #8a9ab5;
+    }
+    .score-bar-wrap { margin-top: 0.5rem; }
+    .score-bar-bg {
+      background: var(--border);
+      border-radius: 4px;
+      height: 4px;
+      overflow: hidden;
+    }
+    .score-bar-fill {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.6s ease;
+    }
+    .score-label { font-size: 0.7rem; color: var(--muted); margin-top: 0.3rem; }
+
+    /* ── Spinner ──────────────────────────────────────────── */
+    .spinner {
+      display: none;
+      width: 22px; height: 22px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 2rem auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <div class="logo">Cine<span>Match</span></div>
+    <div class="tagline">User-based Collaborative Filtering &middot; MovieLens 100K</div>
+  </div>
+  <div class="stats-bar" id="headerStats">
+    <div class="stat"><div class="stat-num" id="hs-ratings">—</div><div class="stat-label">Ratings</div></div>
+    <div class="stat"><div class="stat-num" id="hs-users">—</div><div class="stat-label">Users</div></div>
+    <div class="stat"><div class="stat-num" id="hs-movies">—</div><div class="stat-label">Movies</div></div>
+  </div>
+</header>
+
+<main>
+  <div class="search-card">
+    <h2>Get Personalised Recommendations</h2>
+    <div class="input-row">
+      <div class="input-group">
+        <label for="userId">User ID (1 – 943)</label>
+        <input type="number" id="userId" min="1" max="943" value="1" placeholder="e.g. 42"/>
+      </div>
+      <div class="input-group">
+        <label for="numRecs">Number of recommendations</label>
+        <input type="number" id="numRecs" min="1" max="30" value="10"/>
+      </div>
+      <button class="btn" id="recommendBtn" onclick="fetchRecommendations()">Recommend</button>
+    </div>
+  </div>
+
+  <div class="error-banner" id="errorBanner"></div>
+  <div class="spinner" id="spinner"></div>
+
+  <div id="results">
+    <div class="results-grid">
+      <!-- User panel -->
+      <div class="user-panel">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <div class="user-name" id="userName">User —</div>
+        <div class="user-sub">MovieLens profile</div>
+        <div class="pill-row">
+          <div class="pill">Rated: <strong id="statRated">—</strong></div>
+          <div class="pill">Avg: <strong id="statAvg">—</strong> ★</div>
+        </div>
+        <div class="section-label">Top-rated movies</div>
+        <ul class="rated-list" id="topRatedList"></ul>
+      </div>
+
+      <!-- Recommendations -->
+      <div class="recs-panel">
+        <div class="recs-header">
+          <h3>Recommended for you</h3>
+          <span class="count-badge" id="recCount">0</span>
+        </div>
+        <div class="movie-grid" id="movieGrid"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  CineMatch &mdash; MovieLens 100K &middot; Cosine Similarity Collaborative Filtering
+</footer>
+
+<script>
+  // ── Load header stats on page load ──────────────────────
+  fetch('/api/stats')
+    .then(r => r.json())
+    .then(d => {
+      document.getElementById('hs-ratings').textContent = d.total_ratings.toLocaleString();
+      document.getElementById('hs-users').textContent   = d.total_users.toLocaleString();
+      document.getElementById('hs-movies').textContent  = d.total_movies.toLocaleString();
+    });
+
+  // ── Allow Enter key ──────────────────────────────────────
+  document.getElementById('userId').addEventListener('keydown', e => {
+    if (e.key === 'Enter') fetchRecommendations();
+  });
+
+  // ── Main fetch function ──────────────────────────────────
+  async function fetchRecommendations() {
+    const userId  = document.getElementById('userId').value;
+    const numRecs = document.getElementById('numRecs').value;
+    const btn     = document.getElementById('recommendBtn');
+    const spinner = document.getElementById('spinner');
+    const error   = document.getElementById('errorBanner');
+    const results = document.getElementById('results');
+
+    error.style.display   = 'none';
+    results.style.display = 'none';
+    spinner.style.display = 'block';
+    btn.disabled = true;
+
+    try {
+      const res  = await fetch(`/api/recommend/${userId}?n=${numRecs}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        error.textContent   = data.error || 'Something went wrong.';
+        error.style.display = 'block';
+        return;
+      }
+
+      renderResults(data);
+      results.style.display = 'block';
+    } catch (err) {
+      error.textContent   = 'Could not reach the server.';
+      error.style.display = 'block';
+    } finally {
+      spinner.style.display = 'none';
+      btn.disabled = false;
+    }
+  }
+
+  function renderResults(data) {
+    // User panel
+    const initials = `U${data.user_id}`;
+    document.getElementById('userAvatar').textContent = initials;
+    document.getElementById('userName').textContent   = `User ${data.user_id}`;
+    document.getElementById('statRated').textContent  = data.stats.rated;
+    document.getElementById('statAvg').textContent    = data.stats.avg_rating;
+
+    // Top-rated list
+    const list = document.getElementById('topRatedList');
+    list.innerHTML = data.top_rated.map(m => `
+      <li>
+        <span class="rated-title" title="${esc(m.title)}">${esc(m.title)}</span>
+        <span class="stars">${'★'.repeat(m.rating)}${'☆'.repeat(5 - m.rating)}</span>
+      </li>`).join('');
+
+    // Movie cards
+    const maxScore = Math.max(...data.recommendations.map(r => r.score), 1);
+    document.getElementById('recCount').textContent = data.recommendations.length;
+
+    const grid = document.getElementById('movieGrid');
+    grid.innerHTML = data.recommendations.map((m, i) => {
+      const pct = Math.round((m.score / maxScore) * 100);
+      const genres = m.genres.slice(0, 3).map(g =>
+        `<span class="genre-tag">${esc(g)}</span>`).join('');
+      return `
+        <div class="movie-card">
+          <div class="movie-rank">#${i + 1}</div>
+          <div class="movie-title">${esc(m.title)}</div>
+          <div class="genre-tags">${genres}</div>
+          <div class="score-bar-wrap">
+            <div class="score-bar-bg">
+              <div class="score-bar-fill" style="width:${pct}%"></div>
+            </div>
+            <div class="score-label">Match score: ${m.score.toFixed(2)}</div>
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
